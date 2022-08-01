@@ -19,16 +19,16 @@ class SaveOgolosha implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    // protected $sohranenie;
+    protected $link;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($link)
     {
-        // $this->sohranenie = $saving;
+        $this->link = $link;
     }
 
     /**
@@ -38,17 +38,10 @@ class SaveOgolosha implements ShouldQueue
      */
     public function handle()
     {
-        $firstLink = Test::first();
-
-        if (empty($firstLink)) {
-            return;
-        }
-
         $client = new Client();
-        $crawler = $client->request('GET', $firstLink->link);
+        $crawler = $client->request('GET', $this->link);
 
         if ($crawler->filter('h3')->count() === 0) {
-            $firstLink->delete();
             return;
         };
 
@@ -91,7 +84,7 @@ class SaveOgolosha implements ShouldQueue
 
         $scrapData = [
             'title' => $title,
-            'url' => $firstLink->link,
+            'url' => $this->link,
             'cost' => $costInt,
             'description' => $description,
             'floor' => $floorInt,
@@ -104,11 +97,6 @@ class SaveOgolosha implements ShouldQueue
             'chat_id' => '642114867',
             'text' => view('zalupjuha', $scrapData)->render(),
             'parse_mode' => 'HTML',
-            // 'parse_mode' => view('zalupjuha', $scrapData)->render(),
         ]);
-
-        // return view('zalupjuha', $scrapData);
-
-        $firstLink->delete();
     }
 }

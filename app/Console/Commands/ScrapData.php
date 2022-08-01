@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Goutte\Client;
 use App\Models\Test;
 use App\Models\Scrap;
+use App\Jobs\SaveOgolosha;
 use Illuminate\Console\Command;
 
 class ScrapData extends Command
@@ -60,25 +61,12 @@ class ScrapData extends Command
 
         $all_links = array_unique($all_links, SORT_REGULAR);
 
-        // ['', '', '']
-
-        // [['link' => ''], ['link' => ''], ['link' => '']]
-
         $test = array_filter($all_links, function ($link) {
             return empty(Scrap::where('url', '=', $link)->first());
         });
 
-        // $test = array_map(function ($link) {
-        //     return ['link' => $link];
-        // }, $test);
-
         foreach ($test as $link) {
-            // return $link;
+            SaveOgolosha::dispatch($link);
         }
-        // Test::insert($link);
-
-        // echo "All Avialble Links From this page $url Page<pre>";
-        // print_r($test);
-        // echo "</pre>";
     }
 }

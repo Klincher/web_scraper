@@ -14,17 +14,10 @@ class TestController extends Controller
 {
     public function index()
     {
-        $firstLink = Test::first();
-
-        if (empty($firstLink)) {
-            return;
-        }
-
         $client = new Client();
-        $crawler = $client->request('GET', $firstLink->link);
+        $crawler = $client->request('GET', $this->link);
 
         if ($crawler->filter('h3')->count() === 0) {
-            $firstLink->delete();
             return;
         };
 
@@ -67,7 +60,7 @@ class TestController extends Controller
 
         $scrapData = [
             'title' => $title,
-            'url' => $firstLink->link,
+            'url' => $this->link,
             'cost' => $costInt,
             'description' => $description,
             'floor' => $floorInt,
@@ -80,11 +73,6 @@ class TestController extends Controller
             'chat_id' => '642114867',
             'text' => view('zalupjuha', $scrapData)->render(),
             'parse_mode' => 'HTML',
-            // 'parse_mode' => view('zalupjuha', $scrapData)->render(),
         ]);
-
-        // return view('zalupjuha', $scrapData);
-
-        $firstLink->delete();
     }
 }
